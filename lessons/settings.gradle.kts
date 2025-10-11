@@ -8,7 +8,7 @@ pluginManagement {
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
-rootProject.name = "otus-kotlin-shadrin-202508"
 
-includeBuild("lessons")
-includeBuild("projects")
+rootProject.name = "lessons"
+
+include("hw-1")
