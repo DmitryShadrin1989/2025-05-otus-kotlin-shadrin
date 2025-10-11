@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") apply false
 }
 
-group = "ru.otus.kotlin.task.manager"
+group = "ru.otus.kotlin.shadrin.lessons"
 version = "0.0.1"
 
 repositories {
