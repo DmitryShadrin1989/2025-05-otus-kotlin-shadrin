@@ -1,4 +1,4 @@
-rootProject.name = "projects"
+rootProject.name = "ok-notebook-be"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -26,4 +26,8 @@ plugins {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include(":ok-notebook-tmp")
+include(":ok-notebook-api-v1-jackson")
+include(":ok-notebook-common")
+include(":ok-notebook-stubs")
+include(":ok-notebook-api-v1-mappers")
+
