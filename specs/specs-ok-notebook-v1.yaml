@@ -1,0 +1,523 @@
+openapi: 3.0.3
+info:
+  title: "Notebook ${VERSION_APP}"
+  description: This is where you can manage your notes
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+tags:
+  - name: note
+    description: Create, receive, delete, and search for notes in your notebook
+paths:
+  /note/create:
+    post:
+      tags:
+        - note
+      summary: Create note
+      operationId: noteCreate
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreateRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteCreateResponse'
+  /note/read:
+    post:
+      tags:
+        - note
+      summary: Read note
+      operationId: noteRead
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteReadRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteReadResponse'
+
+  /note/update:
+    post:
+      tags:
+        - note
+      summary: Update note
+      operationId: noteUpdate
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteUpdateRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteUpdateResponse'
+
+  /note/delete:
+    post:
+      tags:
+        - note
+      summary: Delete note
+      operationId: noteDelete
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteDeleteRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteDeleteResponse'
+
+  /note/restore:
+    post:
+      tags:
+        - note
+      summary: Restore note
+      operationId: noteRestore
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRestoreRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteRestoreResponse'
+
+  /note/search:
+    post:
+      tags:
+        - note
+      summary: Search notes
+      operationId: noteSearch
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteSearchRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteSearchResponse'
+
+  /note/list:
+    post:
+      tags:
+        - note
+      summary: List user notes
+      operationId: noteList
+      requestBody:
+        description: Request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteListRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteListResponse'
+
+components:
+  schemas:
+
+    IRequest:
+      type: object
+      description: The basic interface for all requests
+      properties:
+        requestType:
+          type: string
+          description: The descriptor field for calculating the query type
+          example: create
+      discriminator:
+        propertyName: requestType
+        mapping:
+          create: '#/components/schemas/NoteCreateRequest'
+          read:   '#/components/schemas/NoteReadRequest'
+          update: '#/components/schemas/NoteUpdateRequest'
+          delete: '#/components/schemas/NoteDeleteRequest'
+          restore: '#/components/schemas/NoteRestoreRequest'
+          search: '#/components/schemas/NoteSearchRequest'
+          list: '#/components/schemas/NoteListRequest'
+
+    UserId:
+      type: string
+      description: User Identification
+    NoteId:
+      type: string
+      description: Note Identification
+    DateTime:
+      type: string
+      example: "2025-07-20T10:00:00Z"
+      description: Date and time of the last update of the note
+    NoteCategory:
+      type: string
+      example: "Shopping, Medicines, Household Chores"
+      description: Note categories
+    NoteLock:
+      type: string
+      description: The Optimistic Lock version
+
+    BaseNote:
+      type: object
+      description: The object describes the properties that are the same for create and update
+      properties:
+        title:
+          type: string
+          description: Note title
+        content:
+          type: string
+          description: Text of the note
+        category:
+          $ref: '#/components/schemas/NoteCategory'
+        reminderAt:
+          $ref: '#/components/schemas/DateTime'
+
+    NoteCreateObject:
+      allOf:
+        - $ref: '#/components/schemas/BaseNote'
+
+    NoteCreateRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            note:
+              $ref: '#/components/schemas/NoteCreateObject'
+
+    NoteReadObject:
+      allOf:
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/NoteId'
+
+    NoteReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            note:
+              $ref: '#/components/schemas/NoteReadObject'
+
+    NoteUpdateObject:
+      allOf:
+        - $ref: '#/components/schemas/BaseNote'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/NoteId'
+            lock:
+              $ref: '#/components/schemas/NoteLock'
+
+    NoteUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            note:
+              $ref: '#/components/schemas/NoteUpdateObject'
+
+    NoteDeleteRestoreObject:
+      allOf:
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/NoteId'
+            lock:
+              $ref: '#/components/schemas/NoteLock'
+
+    NoteDeleteRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            note:
+              $ref: '#/components/schemas/NoteDeleteRestoreObject'
+
+    NoteRestoreRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            note:
+              $ref: '#/components/schemas/NoteDeleteRestoreObject'
+
+    NoteSearchFilter:
+      type: object
+      description: A set of search filters
+      properties:
+        searchString:
+          type: string
+          description: The search bar that will be searched in the title and text of the note
+        category:
+          $ref: '#/components/schemas/NoteCategory'
+
+    NoteSearchRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            noteFilter:
+              $ref: '#/components/schemas/NoteSearchFilter'
+
+    NoteListFilter:
+      type: object
+      description: Filters for listing notes
+      properties:
+        category:
+          $ref: '#/components/schemas/NoteCategory'
+        isDeleted:
+          type: boolean
+          description: Include deleted notes
+          default: false
+
+    PageRequest:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+
+    NoteListRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - $ref: '#/components/schemas/NoteRequestDebug'
+        - type: object
+          properties:
+            filter:
+              $ref: '#/components/schemas/NoteListFilter'
+            page:
+              $ref: '#/components/schemas/PageRequest'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        group:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+
+    ResponseResult:
+      type: string
+      enum:
+        - success
+        - error
+
+    IResponse:
+      type: object
+      description: The basic interface for all responses
+      properties:
+        responseType:
+          type: string
+          description: The descriptor field for calculating the query type
+          example: create
+        result:
+          $ref: '#/components/schemas/ResponseResult'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      discriminator:
+        propertyName: responseType
+        mapping:
+          create: '#/components/schemas/NoteCreateResponse'
+          read: '#/components/schemas/NoteReadResponse'
+          init: '#/components/schemas/NoteInitResponse'
+
+    NoteInitResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+
+    NoteResponseObject:
+      allOf:
+        - $ref: '#/components/schemas/BaseNote'
+        - type: object
+          description: The object that is returned in the backend response
+          properties:
+            id:
+              $ref: '#/components/schemas/NoteId'
+            updatedAt:
+              $ref: '#/components/schemas/DateTime'
+            lock:
+              $ref: '#/components/schemas/NoteLock'
+            permissions:
+              type: array
+              uniqueItems: true
+              items:
+                $ref: '#/components/schemas/NotePermissions'
+
+    NotePermissions:
+      type: string
+      description: Client access rights for note operations
+      enum:
+        - read
+        - update
+        - delete
+
+    NoteResponseSingle:
+      allOf:
+        - type: object
+          description: A response with a single note object
+          properties:
+            note:
+              $ref: '#/components/schemas/NoteResponseObject'
+
+    NoteResponseMulti:
+      allOf:
+        - type: object
+          description: List of found objects
+          properties:
+            notes:
+              type: array
+              items:
+                $ref: '#/components/schemas/NoteResponseObject'
+
+    NoteCreateResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/NoteResponseSingle'
+
+    NoteReadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/NoteResponseSingle'
+
+    NoteUpdateResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/NoteResponseSingle'
+
+    NoteDeleteResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/NoteResponseSingle'
+
+    NoteRestoreResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/NoteResponseSingle'
+
+    NoteSearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - $ref: '#/components/schemas/NoteResponseMulti'
+
+    PageInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          example: 42
+        totalPages:
+          type: integer
+          example: 5
+
+    NoteListResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            notes:
+              type: array
+              items:
+                $ref: '#/components/schemas/NoteResponseObject'
+            pageInfo:
+              $ref: '#/components/schemas/PageInfo'
+
+    NoteRequestDebug:
+      type: object
+      properties:
+        debug:
+          $ref: '#/components/schemas/NoteDebug'
+
+    NoteDebug:
+      type: object
+      properties:
+        mode:
+          $ref: '#/components/schemas/NoteRequestDebugMode'
+        stub:
+          $ref: '#/components/schemas/NoteRequestDebugStubs'
+
+    NoteRequestDebugMode:
+      type: string
+      enum:
+        - prod
+        - test
+        - stub
+
+    NoteRequestDebugStubs:
+      type: string
+      description: Enumerations of all stabs
+      enum:
+        - success
+        - notFound
+        - badId
+        - badTitle
+        - badContent
+        - cannotDelete
+        - cannotUpdate
+        - cannotCreate
+        - badSearchString
